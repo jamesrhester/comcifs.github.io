@@ -1,6 +1,6 @@
 # Principles for reading and writing CIF information using multiple data blocks
 
-Version: 0.1
+Version: 0.2
 Author: J Hester 
 Date: November 2021
 Status: Draft
@@ -10,8 +10,8 @@ Status: Draft
 Data described by CIF dictionaries can be spread between multiple data
 containers. In some cases these data containers may be in a variety of
 non-CIF formats (e.g. HDF5, columnar ASCII).  In more complex
-scenarios, a number of choices exist as to how such data should be
-distributed between data containers. Choice is generally undesirable
+scenarios, a number of variations exist as to how such data should be
+distributed between data containers. Variability is generally undesirable
 in standards, as it complicates the task of aligning reading and
 writing software. Therefore, these principles have been developed to
 describe how CIF writing software should distribute and describe data
@@ -34,14 +34,20 @@ dictionary may add further `Set` categories to this list. A
 non-default value for `_audit.schema` will usually imply that some 
 or all of these `Set` categories are looped within a data block.
 
-In general, many `Loop` categories will have an implicit dependence on
+`_audit.schema` is defined in the core dictionary. New values are
+assigned with the agreement of COMCIFS, typically at the same time
+as dictionaries are approved. No machine-readable list
+of the `Set` categories corresponding to a given `_audit.schema` is
+available.
+
+In general, many categories (whether `Loop` or `Set`) will have an implicit dependence on
 items that appear in `Set` categories. For example, atomic positions
 in an `atom_site` list depend on the space group and unit cell
 information, which both appear in `Set` categories.  In relational
-terms, there is an additional key data name in such `Loop` categories
-that is a child of the (implicit) key data name for such `Set`
+terms, there is an additional key data name in such categories
+that is a child of the (possibly implicit) key data name for such `Set`
 categories. If the parent value belongs to a `Set` category, this also
-requires that the child data name for such loops takes only the
+requires that the child data name takes only the
 stated value of the parent, which allows child data names to be
 dropped from the data block as their value is unambiguous. In the
 following, "child data names" refers only to these child data names of
@@ -60,14 +66,13 @@ list) should be collected into a separate data block to avoid
 unnecessary repetition in each data block.
 
 3. The CIF standard does not stipulate how to identify data blocks
-   belonging to a single data set.  Dictionaries may define data names
-   that help in this task, or allow the context to determine aggregation.
-
+   belonging to a single data set.
+   
 4. Summary blocks: where desired, the information for one or more
 `Set` categories that has been scattered over multiple data blocks may
 be repeated in a summary loop in a separate data block, for example, a
-list of powder phases with block pointers. In this case
-`_audit.schema` *must* be changed from the default appropriately, and
+list of powder phase identifiers with block pointers (category pd_phase). 
+In this case `_audit.schema` *must* be changed from the default appropriately, and
 the values listed in the summary loop *must* match the values provided
 in each individual data block.
 
@@ -103,7 +108,7 @@ document is in preparation that goes into more detail.
 
 ## Implications for dictionary authors
 
-1. A `Set` category may be equipped with a category key.
+1. A `Set` category may be equipped with an explicit category key.
 2. Child data names of `Set` category keys must be indicated "somehow"
    (see below)
 3. If the desired presentation of data differs from that implied by
